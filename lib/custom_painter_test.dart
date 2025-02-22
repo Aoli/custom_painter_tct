@@ -59,17 +59,17 @@ class HollowCirclePainter extends CustomPainter {
     final shadowPaint = Paint()
       ..color = Colors.black.withOpacity(0.4)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 6;
+      ..strokeWidth = 4; // Reduced from 6
 
     final highlightPaint = Paint()
       ..color = Colors.white.withOpacity(0.6)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 5;
+      ..strokeWidth = 3; // Reduced from 5
 
     final mainStripPaint = Paint()
       ..color = Colors.grey.shade400
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 5;
+      ..strokeWidth = 3; // Reduced from 5
 
     const numberOfStrips = 360 ~/ 30; // Every 30 degrees
     const curveOffset = 0.6; // Reduced from 0.8 for flatter curve
@@ -186,12 +186,12 @@ class BlueBladePainter extends CustomPainter {
     final shadowPaint = Paint()
       ..color = Colors.black.withOpacity(0.4)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 6;
+      ..strokeWidth = 4; // Reduced from 6
 
     final highlightPaint = Paint()
       ..color = Colors.white.withOpacity(0.5) // Increased opacity
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 5;
+      ..strokeWidth = 3; // Reduced from 5
 
     // Updated metallic strip paint
     final metalStripGradient = LinearGradient(
@@ -211,7 +211,7 @@ class BlueBladePainter extends CustomPainter {
       ..shader = metalStripGradient
           .createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 5;
+      ..strokeWidth = 3; // Reduced from 5
 
     const numberOfStrips = 360 ~/ 30;
     const curveOffset = 0.8; // Increased from 0.6 for more curve
@@ -308,11 +308,17 @@ class PipePainter extends CustomPainter {
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       stops: const [0.0, 0.5, 1.0],
-      colors: [
-        Colors.red.shade200, // Lighter pale red top
-        Colors.red.shade300, // Pale red middle
-        Colors.red.shade200, // Lighter pale red bottom
-      ],
+      colors: isLeftPipe
+          ? [
+              Colors.grey.shade300, // Lighter gray top
+              Colors.grey.shade400, // Gray middle
+              Colors.grey.shade300, // Lighter gray bottom
+            ]
+          : [
+              Colors.red.shade200, // Lighter pale red top
+              Colors.red.shade300, // Pale red middle
+              Colors.red.shade200, // Lighter pale red bottom
+            ],
     );
 
     // Modified band gradient for more belt-like appearance
@@ -320,13 +326,21 @@ class PipePainter extends CustomPainter {
       begin: Alignment.centerLeft,
       end: Alignment.centerRight,
       stops: const [0.0, 0.2, 0.5, 0.8, 1.0],
-      colors: [
-        Colors.red.shade200, // Pale edge
-        Colors.red.shade300, // Pale shadow
-        Colors.red.shade400, // Pale middle
-        Colors.red.shade300, // Pale shadow
-        Colors.red.shade200, // Pale edge
-      ],
+      colors: isLeftPipe
+          ? [
+              Colors.grey.shade300, // Light edge
+              Colors.grey.shade400, // Light shadow
+              Colors.grey.shade500, // Middle
+              Colors.grey.shade400, // Light shadow
+              Colors.grey.shade300, // Light edge
+            ]
+          : [
+              Colors.red.shade200, // Pale edge
+              Colors.red.shade300, // Pale shadow
+              Colors.red.shade400, // Pale middle
+              Colors.red.shade300, // Pale shadow
+              Colors.red.shade200, // Pale edge
+            ],
     );
 
     // Paints
