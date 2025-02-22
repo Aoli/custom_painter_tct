@@ -191,26 +191,22 @@ class PipePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final pipeWidth = circleRadius * 0.4;
-    final bandWidth = pipeWidth * 0.4;  // Width of the mounting band
-    
+    final bandWidth = pipeWidth * 0.4; // Width of the mounting band
+
     // Main pipe rectangle (full length, no shrinking)
     final pipeRect = Rect.fromCenter(
-      center: Offset(
-        center.dx + (pipeLength / 2),
-        center.dy - (size.height / 2) + (pipeWidth / 2)
-      ),
-      width: pipeLength,  // No reduction for band
+      center: Offset(center.dx + (pipeLength / 2),
+          center.dy - (size.height / 2) + (pipeWidth / 2)),
+      width: pipeLength, // No reduction for band
       height: pipeWidth,
     );
 
     // Band rectangle at the end (protrudes from pipe)
     final bandRect = Rect.fromCenter(
-      center: Offset(
-        center.dx + pipeLength - (bandWidth / 2),
-        center.dy - (size.height / 2) + (pipeWidth / 2)
-      ),
+      center: Offset(center.dx + pipeLength - (bandWidth / 2),
+          center.dy - (size.height / 2) + (pipeWidth / 2)),
       width: bandWidth,
-      height: pipeWidth * 1.15,  // Slightly larger than pipe
+      height: pipeWidth * 1.15, // Slightly larger than pipe
     );
 
     // Gradients
@@ -255,13 +251,14 @@ class PipePainter extends CustomPainter {
     // Create shapes with different radiuses
     final pipeRRect = RRect.fromRectAndRadius(
       pipeRect,
-      Radius.circular(pipeWidth / 2),  // Round ends for pipe
+      Radius.circular(pipeWidth /
+          8), // Changed from pipeWidth/2 to match band's corner radius
     );
 
     // Create band with sharper corners
     final bandRRect = RRect.fromRectAndRadius(
       bandRect,
-      Radius.circular(pipeWidth / 8),  // Much less rounded for band
+      Radius.circular(pipeWidth / 8), // Much less rounded for band
     );
 
     // Draw shadow
