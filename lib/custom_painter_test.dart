@@ -191,22 +191,26 @@ class PipePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final pipeWidth = circleRadius * 0.4;
-    final bandWidth = pipeWidth * 0.4; // Width of the mounting band
-
+    final bandWidth = pipeWidth * 0.4;  // Width of the mounting band
+    
     // Main pipe rectangle (full length, no shrinking)
     final pipeRect = Rect.fromCenter(
-      center: Offset(center.dx + (pipeLength / 2),
-          center.dy - (size.height / 2) + (pipeWidth / 2)),
-      width: pipeLength, // No reduction for band
+      center: Offset(
+        center.dx + (pipeLength / 2),
+        center.dy - (size.height / 2) + (pipeWidth / 2)
+      ),
+      width: pipeLength,  // No reduction for band
       height: pipeWidth,
     );
 
     // Band rectangle at the end (protrudes from pipe)
     final bandRect = Rect.fromCenter(
-      center: Offset(center.dx + pipeLength - (bandWidth / 2),
-          center.dy - (size.height / 2) + (pipeWidth / 2)),
+      center: Offset(
+        center.dx + pipeLength - (bandWidth / 2),
+        center.dy - (size.height / 2) + (pipeWidth / 2)
+      ),
       width: bandWidth,
-      height: pipeWidth * 1.15, // Slightly larger than pipe
+      height: pipeWidth * 1.15,  // Slightly larger than pipe
     );
 
     // Gradients
@@ -248,57 +252,32 @@ class PipePainter extends CustomPainter {
       ..color = Colors.black.withOpacity(0.3)
       ..style = PaintingStyle.fill;
 
-    // Create custom pipe path
-    final pipePath = Path();
-    final radius = pipeWidth / 2; // Use same radius for all corners
-
-    // Start from top-left
-    pipePath.moveTo(center.dx, center.dy - (size.height / 2));
-
-    // Add top-left corner with full radius
-    pipePath.quadraticBezierTo(
-        center.dx,
-        center.dy - (size.height / 2) + (pipeWidth / 2),
-        center.dx + radius,
-        center.dy - (size.height / 2) + (pipeWidth / 2));
-
-    // Draw top line
-    pipePath.lineTo(center.dx + pipeLength - radius,
-        center.dy - (size.height / 2) + (pipeWidth / 2));
-
-    // Add right end rounded corners
-    pipePath.arcToPoint(
-        Offset(
-            center.dx + pipeLength, center.dy - (size.height / 2) + pipeWidth),
-        radius: Radius.circular(radius),
-        clockwise: true);
-
-    // Draw bottom line
-    pipePath.lineTo(
-        center.dx + radius, center.dy - (size.height / 2) + pipeWidth);
-
-    // Add bottom-left corner
-    pipePath.quadraticBezierTo(
-        center.dx,
-        center.dy - (size.height / 2) + pipeWidth,
-        center.dx,
-        center.dy - (size.height / 2) + (pipeWidth / 2));
-
-    pipePath.close();
-
-    // Update shadow drawing
-    canvas.drawPath(pipePath.shift(const Offset(2, 2)), shadowPaint);
-
-    // Draw main pipe
-    canvas.drawPath(pipePath, pipePaint);
-
-    // Define bandRRect
-    final bandRRect = RRect.fromRectAndRadius(
-      bandRect,
-      Radius.circular(pipeWidth * 0.2), // Adjust the radius as needed
+    // Create shapes with different radiuses
+    final pipeRRect = RRect.fromRectAndRadius(
+      pipeRect,
+      Radius.circular(pipeWidth / 2),  // Round ends for pipe
     );
 
-    // Keep existing band drawing code
+    // Create band with sharper corners
+    final bandRRect = RRect.fromRectAndRadius(
+      bandRect,
+      Radius.circular(pipeWidth / 8),  // Much less rounded for band
+    );
+
+    // Draw shadow
+    canvas.drawRRect(
+      pipeRRect.shift(const Offset(2, 2)),
+      shadowPaint,
+    );
+    canvas.drawRRect(
+      bandRRect.shift(const Offset(2, 2)),
+      shadowPaint,
+    );
+
+    // Draw main pipe
+    canvas.drawRRect(pipeRRect, pipePaint);
+
+    // Draw mounting band
     canvas.drawRRect(bandRRect, bandPaint);
   }
 
