@@ -115,6 +115,19 @@ class HollowCirclePainter extends CustomPainter {
       canvas.drawPath(path, mainStripPaint);
       canvas.drawPath(highlightPath, highlightPaint);
     }
+
+    // Add center bolt
+    final boltPaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: center,
+        width: 20, // Wider bolt
+        height: 12, // Flatter bolt
+      ),
+      boltPaint,
+    );
   }
 
   @override
@@ -159,7 +172,15 @@ class BlueBladePainter extends CustomPainter {
     final boltPaint = Paint()
       ..color = Colors.black
       ..style = PaintingStyle.fill;
-    canvas.drawCircle(center, 8, boltPaint);
+    // Draw wider, flatter bolt
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: center,
+        width: 20, // Increased width
+        height: 12, // Reduced height for flatter appearance
+      ),
+      boltPaint,
+    );
 
     // Draw blades with 3D effect (30 degrees offset from red blades)
     final shadowPaint = Paint()
