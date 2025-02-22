@@ -215,23 +215,23 @@ class PipePainter extends CustomPainter {
       end: Alignment.bottomCenter,
       stops: const [0.0, 0.5, 1.0],
       colors: [
-        Colors.grey.shade400, // Lighter top
-        Colors.grey.shade600, // Darker middle
-        Colors.grey.shade400, // Lighter bottom
+        Colors.red.shade400, // Lighter red top
+        Colors.red.shade700, // Darker red middle
+        Colors.red.shade400, // Lighter red bottom
       ],
     );
 
-    // Modified band gradient for more belt-like appearance
+    // Modified band gradient for more belt-like appearance in red
     final bandGradient = LinearGradient(
       begin: Alignment.centerLeft,
       end: Alignment.centerRight,
       stops: const [0.0, 0.2, 0.5, 0.8, 1.0],
       colors: [
-        Colors.grey.shade400, // Edge
-        Colors.grey.shade500, // Shadow
-        Colors.grey.shade600, // Middle
-        Colors.grey.shade500, // Shadow
-        Colors.grey.shade400, // Edge
+        Colors.red.shade400, // Edge
+        Colors.red.shade500, // Shadow
+        Colors.red.shade700, // Middle
+        Colors.red.shade500, // Shadow
+        Colors.red.shade400, // Edge
       ],
     );
 
