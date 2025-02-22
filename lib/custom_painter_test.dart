@@ -13,9 +13,23 @@ class HollowCirclePainter extends CustomPainter {
     final radius = diameter / 2;
     final holeRadius = holeDiameter / 2;
 
-    // Base red circle with hole
+    // Metallic red gradient for base circle
+    final metalRedGradient = LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
+      colors: [
+        Colors.red.shade300, // Highlight
+        Colors.red.shade400, // Light
+        Colors.red.shade700, // Middle
+        Colors.red.shade900, // Shadow
+        Colors.red.shade700, // Edge
+      ],
+    );
+
     final circlePaint = Paint()
-      ..color = const Color(0xFFFF0000)
+      ..shader = metalRedGradient
+          .createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.fill;
 
     final circlePath = Path()
@@ -104,9 +118,23 @@ class BlueBladePainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = diameter / 2;
 
-    // Base blue circle
+    // Metallic blue gradient for base circle
+    final metalBlueGradient = LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
+      colors: [
+        Colors.blue.shade300, // Highlight
+        Colors.blue.shade400, // Light
+        Colors.blue.shade700, // Middle
+        Colors.blue.shade900, // Shadow
+        Colors.blue.shade700, // Edge
+      ],
+    );
+
     final circlePaint = Paint()
-      ..color = Colors.blue.withOpacity(1.0)
+      ..shader = metalBlueGradient
+          .createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(center, radius, circlePaint);
