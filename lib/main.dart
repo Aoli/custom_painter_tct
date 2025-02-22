@@ -13,9 +13,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
         body: Center(
-          child: MyWidget(), // This will show your circle with slider
+          child: CircleControlWidget(), // This will show your circle with slider
         ),
       ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
