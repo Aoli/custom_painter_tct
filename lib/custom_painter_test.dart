@@ -329,13 +329,14 @@ class _CircleControlWidgetState extends State<CircleControlWidget>
   late AnimationController
       _speedController; // Single controller for both circles
   bool _isSpinning = false;
+  final Duration _spinDuration = const Duration(seconds: 15); // Total spin time
 
   @override
   void initState() {
     super.initState();
     _speedController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4),
+      duration: _spinDuration,
     );
   }
 
@@ -349,13 +350,12 @@ class _CircleControlWidgetState extends State<CircleControlWidget>
     setState(() {
       _isSpinning = !_isSpinning;
       if (_isSpinning) {
-        _speedController.repeat();
-      } else {
-        // Gradually slow down over 15 seconds
+        // Start spinning and gradually slow down
+        _speedController.reset();
         _speedController
             .animateTo(
           1.0,
-          duration: const Duration(seconds: 10),
+          duration: _spinDuration,
           curve: Curves.easeOut,
         )
             .then((_) {
@@ -363,6 +363,9 @@ class _CircleControlWidgetState extends State<CircleControlWidget>
             _isSpinning = false;
           });
         });
+      } else {
+        // Stop immediately if currently spinning
+        _speedController.stop();
       }
     });
   }
