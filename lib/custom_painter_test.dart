@@ -329,7 +329,10 @@ class _CircleControlWidgetState extends State<CircleControlWidget>
   late AnimationController
       _speedController; // Single controller for both circles
   bool _isSpinning = false;
-  final Duration _spinDuration = const Duration(seconds: 15); // Total spin time
+  Duration _spinDuration = const Duration(seconds: 15); // Total spin time
+
+  // Add speed multiplier
+  double _speedMultiplier = 1.0;
 
   @override
   void initState() {
@@ -350,12 +353,13 @@ class _CircleControlWidgetState extends State<CircleControlWidget>
     setState(() {
       _isSpinning = !_isSpinning;
       if (_isSpinning) {
-        // Start spinning and gradually slow down
         _speedController.reset();
         _speedController
             .animateTo(
           1.0,
-          duration: _spinDuration,
+          duration: Duration(
+              milliseconds:
+                  (_spinDuration.inMilliseconds / _speedMultiplier).round()),
           curve: Curves.easeOut,
         )
             .then((_) {
@@ -364,7 +368,6 @@ class _CircleControlWidgetState extends State<CircleControlWidget>
           });
         });
       } else {
-        // Stop immediately if currently spinning
         _speedController.stop();
       }
     });
@@ -426,6 +429,7 @@ class _CircleControlWidgetState extends State<CircleControlWidget>
           width: 300,
           child: Column(
             children: [
+              // Keep existing circle size controls
               Row(
                 children: [
                   const Text('Red Circle: '),
@@ -462,40 +466,49 @@ class _CircleControlWidgetState extends State<CircleControlWidget>
                   Text('${_blueDiameter.round()}'),
                 ],
               ),
+              // Duration control
               Row(
                 children: [
-                  const Text('Speed: '),
+                  const Text('Duration: '),
                   Expanded(
                     child: Slider(
-                      value:
-                          _speedController.duration!.inMilliseconds.toDouble(),
-                      min: 5000, // Minimum 5 seconds
-                      max: 20000, // Maximum 20 seconds
+                      value: _spinDuration.inMilliseconds.toDouble(),
+                      min: 5000,
+                      max: 20000,
                       onChanged: (value) {
                         setState(() {
-                          _speedController.duration =
-                              Duration(milliseconds: value.round());
+                          _spinDuration = Duration(milliseconds: value.round());
                           if (_isSpinning) {
-                            // Reset and start the gradual slowdown animation
-                            _speedController.reset();
-                            _speedController
-                                .animateTo(
-                              1.0,
-                              duration: _speedController.duration,
-                              curve: Curves.easeOut,
-                            )
-                                .then((_) {
-                              setState(() {
-                                _isSpinning = false;
-                              });
-                            });
+                            _toggleSpin();
                           }
                         });
                       },
                     ),
                   ),
                   Text(
-                      '${(_speedController.duration!.inMilliseconds / 1000).toStringAsFixed(1)}s'),
+                      '${(_spinDuration.inMilliseconds / 1000).toStringAsFixed(1)}s'),
+                ],
+              ),
+              // Speed multiplier control
+              Row(
+                children: [
+                  const Text('Speed: '),
+                  Expanded(
+                    child: Slider(
+                      value: _speedMultiplier,
+                      min: 0.5,
+                      max: 2.0,
+                      onChanged: (value) {
+                        setState(() {
+                          _speedMultiplier = value;
+                          if (_isSpinning) {
+                            _toggleSpin();
+                          }
+                        });
+                      },
+                    ),
+                  ),
+                  Text('${_speedMultiplier.toStringAsFixed(1)}x'),
                 ],
               ),
             ],
