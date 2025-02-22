@@ -189,12 +189,27 @@ class BlueBladePainter extends CustomPainter {
       ..strokeWidth = 6;
 
     final highlightPaint = Paint()
-      ..color = Colors.white.withOpacity(0.6)
+      ..color = Colors.white.withOpacity(0.5) // Increased opacity
       ..style = PaintingStyle.stroke
       ..strokeWidth = 5;
 
+    // Updated metallic strip paint
+    final metalStripGradient = LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      stops: const [0.0, 0.3, 0.5, 0.7, 1.0],
+      colors: [
+        Colors.grey.shade300, // Lighter highlight
+        Colors.grey.shade400,
+        Colors.grey.shade600, // Middle tone
+        Colors.grey.shade700,
+        Colors.grey.shade500, // Edge reflection
+      ],
+    );
+
     final mainStripPaint = Paint()
-      ..color = Colors.grey.shade400
+      ..shader = metalStripGradient
+          .createShader(Rect.fromCircle(center: center, radius: radius))
       ..style = PaintingStyle.stroke
       ..strokeWidth = 5;
 
@@ -243,60 +258,74 @@ class BlueBladePainter extends CustomPainter {
   }
 }
 
+// Update PipePainter class:
 class PipePainter extends CustomPainter {
   final double pipeLength;
   final double circleRadius;
+  final bool isLeftPipe; // New parameter
 
   PipePainter({
     required this.pipeLength,
     required this.circleRadius,
+    this.isLeftPipe = false, // Default to right pipe
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final pipeWidth = circleRadius * 0.4;
-    final bandWidth = pipeWidth * 0.4; // Width of the mounting band
+    final bandWidth = pipeWidth * 0.4;
 
-    // Main pipe rectangle (full length, no shrinking)
+    // Adjust position based on direction
     final pipeRect = Rect.fromCenter(
-      center: Offset(center.dx + (pipeLength / 2),
-          center.dy - (size.height / 2) + (pipeWidth / 2)),
-      width: pipeLength, // No reduction for band
+      center: Offset(
+          center.dx + (isLeftPipe ? -pipeLength / 2 : pipeLength / 2),
+          center.dy +
+              (isLeftPipe
+                  ? (size.height / 2) - (pipeWidth / 2)
+                  : -(size.height / 2) + (pipeWidth / 2))),
+      width: pipeLength,
       height: pipeWidth,
     );
 
-    // Band rectangle at the end (protrudes from pipe)
+    // Adjust band position based on direction
     final bandRect = Rect.fromCenter(
-      center: Offset(center.dx + pipeLength - (bandWidth / 2),
-          center.dy - (size.height / 2) + (pipeWidth / 2)),
+      center: Offset(
+          center.dx +
+              (isLeftPipe
+                  ? -pipeLength + (bandWidth / 2)
+                  : pipeLength - (bandWidth / 2)),
+          center.dy +
+              (isLeftPipe
+                  ? (size.height / 2) - (pipeWidth / 2)
+                  : -(size.height / 2) + (pipeWidth / 2))),
       width: bandWidth,
-      height: pipeWidth * 1.15, // Slightly larger than pipe
+      height: pipeWidth * 1.15,
     );
 
-    // Gradients
+    // Gradients with different colors based on pipe position
     final pipeGradient = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
       stops: const [0.0, 0.5, 1.0],
       colors: [
-        Colors.red.shade400, // Lighter red top
-        Colors.red.shade700, // Darker red middle
-        Colors.red.shade400, // Lighter red bottom
+        Colors.red.shade200, // Lighter pale red top
+        Colors.red.shade300, // Pale red middle
+        Colors.red.shade200, // Lighter pale red bottom
       ],
     );
 
-    // Modified band gradient for more belt-like appearance in red
+    // Modified band gradient for more belt-like appearance
     final bandGradient = LinearGradient(
       begin: Alignment.centerLeft,
       end: Alignment.centerRight,
       stops: const [0.0, 0.2, 0.5, 0.8, 1.0],
       colors: [
-        Colors.red.shade400, // Edge
-        Colors.red.shade500, // Shadow
-        Colors.red.shade700, // Middle
-        Colors.red.shade500, // Shadow
-        Colors.red.shade400, // Edge
+        Colors.red.shade200, // Pale edge
+        Colors.red.shade300, // Pale shadow
+        Colors.red.shade400, // Pale middle
+        Colors.red.shade300, // Pale shadow
+        Colors.red.shade200, // Pale edge
       ],
     );
 
@@ -309,8 +338,9 @@ class PipePainter extends CustomPainter {
       ..shader = bandGradient.createShader(bandRect)
       ..style = PaintingStyle.fill;
 
+    // Update shadow opacity for left pipe
     final shadowPaint = Paint()
-      ..color = Colors.black.withOpacity(0.3)
+      ..color = Colors.black.withOpacity(0.2)
       ..style = PaintingStyle.fill;
 
     // Create shapes with different radiuses
@@ -360,7 +390,7 @@ class CircleControlWidget extends StatefulWidget {
 class _CircleControlWidgetState extends State<CircleControlWidget>
     with TickerProviderStateMixin {
   double _redDiameter = 300.0;
-  double _blueDiameter = 280.0;
+  double _blueDiameter = 230.0;
   static const double _holeDiameter = 100.0;
 
   late AnimationController
@@ -418,6 +448,16 @@ class _CircleControlWidgetState extends State<CircleControlWidget>
         Stack(
           alignment: Alignment.center,
           children: [
+            // Add left pipe (drawn first, so it appears below other elements)
+            CustomPaint(
+              size: Size(max(_redDiameter, _blueDiameter),
+                  max(_redDiameter, _blueDiameter)),
+              painter: PipePainter(
+                pipeLength: (_redDiameter / 2) * 1.2,
+                circleRadius: _redDiameter / 2,
+                isLeftPipe: true, // New parameter to indicate left pipe
+              ),
+            ),
             // Existing red circle
             AnimatedBuilder(
               animation: _speedController,
@@ -444,14 +484,20 @@ class _CircleControlWidgetState extends State<CircleControlWidget>
                 );
               },
             ),
-            // Add new pipe layer
+            // Existing right pipe
             CustomPaint(
               size: Size(max(_redDiameter, _blueDiameter),
                   max(_redDiameter, _blueDiameter)),
               painter: PipePainter(
-                pipeLength: (_redDiameter / 2) * 1.2, // radius + 20%
-                circleRadius: _redDiameter / 2, // Pass the red circle's radius
+                pipeLength: (_redDiameter / 2) * 1.2,
+                circleRadius: _redDiameter / 2,
+                isLeftPipe: false, // Default right pipe
               ),
+            ),
+            // Add center bolt on top
+            CustomPaint(
+              size: Size(25, 25), // Make width and height equal for round bolt
+              painter: BoltPainter(),
             ),
           ],
         ),
@@ -582,4 +628,53 @@ class MyWidget extends StatelessWidget {
       child: CircleControlWidget(),
     );
   }
+}
+
+// Add new BoltPainter class:
+class BoltPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = 12.5;
+
+    // Metallic gradient for bolt
+    final metalGradient = RadialGradient(
+      center: const Alignment(-0.3, -0.3), // Offset for light source
+      radius: 0.9,
+      stops: const [0.0, 0.3, 0.6, 0.9, 1.0],
+      colors: [
+        Colors.grey.shade400, // Highlight
+        Colors.grey.shade500,
+        Colors.grey.shade600,
+        Colors.grey.shade700,
+        Colors.grey.shade800, // Edge shadow
+      ],
+    );
+
+    final boltPaint = Paint()
+      ..shader = metalGradient
+          .createShader(Rect.fromCircle(center: center, radius: radius))
+      ..style = PaintingStyle.fill;
+
+    // Draw metallic bolt
+    canvas.drawCircle(
+      center,
+      radius,
+      boltPaint,
+    );
+
+    // Add subtle highlight
+    final highlightPaint = Paint()
+      ..color = Colors.white.withOpacity(0.3)
+      ..style = PaintingStyle.fill;
+
+    canvas.drawCircle(
+      Offset(center.dx - 3, center.dy - 3),
+      radius * 0.3,
+      highlightPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
