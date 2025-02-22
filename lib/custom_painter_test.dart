@@ -323,7 +323,18 @@ class _CircleControlWidgetState extends State<CircleControlWidget>
       if (_isSpinning) {
         _speedController.repeat();
       } else {
-        _speedController.stop();
+        // Gradually slow down over 15 seconds
+        _speedController
+            .animateTo(
+          1.0,
+          duration: const Duration(seconds: 10),
+          curve: Curves.easeOut,
+        )
+            .then((_) {
+          setState(() {
+            _isSpinning = false;
+          });
+        });
       }
     });
   }
