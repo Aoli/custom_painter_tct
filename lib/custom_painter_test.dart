@@ -12,6 +12,22 @@ class HollowCirclePainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = diameter / 2;
     final holeRadius = holeDiameter / 2;
+    final borderWidth = 5.0;
+    final borderGap = 2.0;
+
+    // Border paint (draw this first)
+    final borderPaint = Paint()
+      ..color = Colors.red.shade900 // Darker red for border
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = borderWidth;
+
+    // Draw outer border circle
+    canvas.drawCircle(
+        center,
+        radius -
+            borderGap -
+            (borderWidth / 2), // Adjust radius for gap and border width
+        borderPaint);
 
     // Metallic red gradient for base circle
     final metalRedGradient = LinearGradient(
