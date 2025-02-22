@@ -469,14 +469,26 @@ class _CircleControlWidgetState extends State<CircleControlWidget>
                     child: Slider(
                       value:
                           _speedController.duration!.inMilliseconds.toDouble(),
-                      min: 1000, // Minimum 1 second
-                      max: 10000, // Maximum 10 seconds
+                      min: 5000, // Minimum 5 seconds
+                      max: 20000, // Maximum 20 seconds
                       onChanged: (value) {
                         setState(() {
                           _speedController.duration =
                               Duration(milliseconds: value.round());
                           if (_isSpinning) {
-                            _speedController.repeat();
+                            // Reset and start the gradual slowdown animation
+                            _speedController.reset();
+                            _speedController
+                                .animateTo(
+                              1.0,
+                              duration: _speedController.duration,
+                              curve: Curves.easeOut,
+                            )
+                                .then((_) {
+                              setState(() {
+                                _isSpinning = false;
+                              });
+                            });
                           }
                         });
                       },
